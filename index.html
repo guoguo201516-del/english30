@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>30 天英语自学 · 第 1 周</title>
+<style>
+:root{--bg:#f4f6fb;--surface:#fff;--ink:#14213d;--muted:#5b6785;--line:#dfe4f0;--accent:#2f5bea;--on-accent:#fff;--play:#ffc93c;--on-play:#14213d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1420;--surface:#19202f;--ink:#eaf0ff;--muted:#9aa7c7;--line:#2a3350;--accent:#7b9bff;--on-accent:#0f1420}}
+:root[data-theme="dark"]{--bg:#0f1420;--surface:#19202f;--ink:#eaf0ff;--muted:#9aa7c7;--line:#2a3350;--accent:#7b9bff;--on-accent:#0f1420}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+.top{color:var(--muted);font-size:14px;margin:0 0 8px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
+.tabs button{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.tabs button[aria-current="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.opts{display:flex;gap:8px;margin:10px 0 0;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;min-height:40px}
+.opt[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.day{color:var(--accent);font-weight:700;font-size:15px;margin:18px 0 0}
+h1{font-size:28px;line-height:1.25;margin:2px 0 0}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:16px 0}
+.task p{margin:0}
+.bar{margin:22px 0 8px}
+h2{font-size:17px;margin:0}
+ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+.txt{flex:1;min-width:0}
+.en{font-size:20px;font-weight:600;line-height:1.3}
+.zh{color:var(--muted);font-size:14px}
+.quiz .zh:not(.show){visibility:hidden}
+.say{flex:none;width:48px;height:48px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;cursor:pointer}
+.say.on{background:var(--play);color:var(--on-play)}
+.say svg{width:24px;height:24px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--play);outline-offset:2px}
+.checks{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 16px}
+.checks label{display:flex;gap:12px;align-items:center;padding:12px 0;font-size:17px}
+input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent)}
+.msg{color:var(--muted);font-size:14px;margin-top:12px}
+[hidden]{display:none!important}
+#lock{padding-top:24px}
+#lock input{width:100%;font:inherit;font-size:20px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);margin:12px 0;text-transform:uppercase}
+</style>
+</head>
+<body>
+<main>
+<section id="lock">
+<p class="top">30 天英语自学 · 第 1 周</p>
+<h1>输入你的学习码</h1>
+<p>购买后你会收到一个学习码，输入后开始学习。</p>
+<input id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="例如 A01-XXXXXXXX" aria-label="学习码">
+<button class="opt" id="go">开始学习</button>
+<p class="msg" id="err" hidden></p>
+</section>
+<div id="app" hidden>
+<p class="top">30 天英语自学 · 第 1 周</p>
+<div class="tabs" id="tabs"></div>
+<div class="opts">
+<button class="opt" id="slow" aria-pressed="false">慢速：关</button>
+<button class="opt" id="quiz" aria-pressed="false">遮住中文：关</button>
+</div>
+<p class="msg" id="msg" hidden>这个浏览器不支持朗读，请改用 Chrome 或 Safari 打开。</p>
+<div id="view"></div>
+</div>
+</main>
+<script>
+var K={"A01":{"s":"41GfDUU3Ls8Ydt5GTUFRpw==","i":"N/o+kvyiMJOOinwE","w":"C4ClzHDew2TDELvVdHobu5JkY8iz1ZIveCp5UoKQmw+jOrptO9GD6qJMKJFI/pTB"},"A02":{"s":"bIndGnY1NMGsZ4jcNVkqEA==","i":"6nwJI1D9+k5H1D7A","w":"wk3G/DDzAgLftKWGR3ZFD5bYHLiQg61qvF4LN7ny4G8Cs7Fu/HADMRkxgAbsg7K9"},"A03":{"s":"zE/JF9bqbFQS7Ilq4vvugA==","i":"kzDnDSmdwrCO9/al","w":"Am6QMQ1NjKG6kzZgQZBO0w+TN8aH3W3njm8XPOSdtCEoIicZQCE51fqQ7hmaqma/"},"A04":{"s":"3+fn1yChhhzc1aat9k43bA==","i":"1HEb1PlYTsIFZMSS","w":"kmS5WiNwEKEX+6GtNl+CahjpGpaHXfaDRDZEhhYA17zBBiu9wzw58aMzWfl5G1gF"},"A05":{"s":"tYQscidKJNPGPE+hH28bjg==","i":"qeKjYNZvAH23sqQ2","w":"OCTkHVq2GgU68Kfj2Di150VUdFuWBZDvgFmJj39pAHm+akskqEEZgfznxiJLBSkS"},"A06":{"s":"gB1v91CXOvKD7xXOpBvSOg==","i":"s525kPn1ov4ryAGm","w":"As20WG/diN8r9OprmGi2fV1JHCCcrAsPKGt5fmMQOm6zF7WG9ty8rli+vr6+NPis"},"A07":{"s":"Wgqmy52Wx2vaOcacJkiLIA==","i":"yEoPcWqccWmBB0T4","w":"UQAs1GUVotSZzNJMlSKOHoRbKn5SsecI5YVupvyrO+GX3KKtBlHK8RxbMSvzPZnv"},"A08":{"s":"5CZXfsqpSg42CVPewDBwZQ==","i":"p1m87Gsdclm2v8dp","w":"RHi1kWsOotDc/0EAk/yCqNLpYKTOs3BfJKva9OJ9oaQuPbvdo/AFtCLeDQSWzBfm"},"A09":{"s":"SQMPdd15s76jyJa9BYwFrw==","i":"r/BxpAwjHlinBFfu","w":"wZorArNvevXBx4GhW9mS+kHwE1LHlDGMeR/ba1XGPm83mprp7JjMhVUI7bO3lmtF"},"A10":{"s":"AgTfhh0S8uVsI6SOLwnHkA==","i":"nveo9H30MxYKiVJf","w":"9y3HqwfXAjyubE2OOmX3zyeajyxo5Xa2uwvh7lfjnJyiFjOSpZgdxD+JRn/+EidL"}};
+var C={"i":"Ap1hBFryPbgXNrs5","d":"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"};
+var D=null;
+/*UNLOCK*/
+function B64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++){u[i]=b.charCodeAt(i);}return u;}
+async function unlock(code){
+  code=String(code).trim().toUpperCase();
+  var id=code.split("-")[0];
+  if(!Object.prototype.hasOwnProperty.call(K,id)){return false;}
+  var e=K[id];
+  try{
+    var km=await crypto.subtle.importKey("raw",new TextEncoder().encode(code),"PBKDF2",false,["deriveKey"]);
+    var wk=await crypto.subtle.deriveKey({name:"PBKDF2",salt:B64(e.s),iterations:200000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["decrypt"]);
+    var raw=await crypto.subtle.decrypt({name:"AES-GCM",iv:B64(e.i)},wk,B64(e.w));
+    var ck=await crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);
+    var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:B64(C.i)},ck,B64(C.d));
+    D=JSON.parse(new TextDecoder().decode(pt));
+    return true;
+  }catch(err){return false;}
+}
+/*END*/
+var icon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+var synth=window.speechSynthesis,slow=false,view=document.getElementById("view"),tabs=document.getElementById("tabs");
+function say(text,btn){
+  if(!synth){document.getElementById("msg").hidden=false;return;}
+  synth.cancel();
+  var on=document.querySelectorAll(".say.on");
+  for(var i=0;i<on.length;i++){on[i].classList.remove("on");}
+  var u=new SpeechSynthesisUtterance(text.replace(/___/g,"").replace(/’/g,"'"));
+  u.lang="en-US";u.rate=slow?0.6:0.9;
+  var vs=synth.getVoices()||[];
+  for(var j=0;j<vs.length;j++){if(/^en[-_]US/i.test(vs[j].lang)){u.voice=vs[j];break;}}
+  u.onstart=function(){btn.classList.add("on");};
+  u.onend=u.onerror=function(){btn.classList.remove("on");};
+  synth.speak(u);
+}
+function li(it){return '<li><div class="txt"><div class="en">'+it[0]+'</div><div class="zh">'+it[1]+'</div></div><button class="say" data-s="'+(it[2]||it[0])+'" aria-label="朗读">'+icon+'</button></li>';}
+var saved={};
+try{saved=JSON.parse(localStorage.getItem("eng30-w1")||"{}");}catch(e){saved={};}
+function show(n){
+  var d=D[n-1];
+  var h='<p class="day">第 '+n+' 天</p><h1>'+d.t+'</h1><div class="task"><p>今日任务：'+d.k+'</p></div>';
+  h+='<div class="bar"><h2>今日内容</h2></div><ul>'+d.i.map(li).join("")+'</ul>';
+  if(n>1&&n<7){h+='<div class="bar"><h2>5 分钟复习：第 '+(n-1)+' 天的内容</h2></div><ul>'+D[n-2].i.slice(0,5).map(li).join("")+'</ul>';}
+  h+='<div class="bar"><h2>今日打卡</h2></div><div class="checks">'+d.c.map(function(c,j){return '<label><input type="checkbox" data-k="d'+n+'c'+j+'">'+c+'</label>';}).join("")+'</div>';
+  view.innerHTML=h;
+  var cs=view.querySelectorAll("input[data-k]");
+  for(var i=0;i<cs.length;i++){cs[i].checked=!!saved[cs[i].dataset.k];}
+  var bs=tabs.children;
+  for(var j=0;j<bs.length;j++){bs[j].setAttribute("aria-current",String(j+1===n));}
+  window.scrollTo(0,0);
+}
+for(var n=1;n<=7;n++){(function(n){var b=document.createElement("button");b.textContent=n;b.setAttribute("aria-label","第 "+n+" 天");b.addEventListener("click",function(){location.hash="day"+n;});tabs.appendChild(b);})(n);}
+function fromHash(){if(!D){return;}var m=/^#day([1-7])$/.exec(location.hash);show(m?+m[1]:1);}
+window.addEventListener("hashchange",fromHash);
+document.addEventListener("click",function(e){
+  var b=e.target.closest(".say");
+  if(b){say(b.dataset.s,b);return;}
+  var t=e.target.closest(".txt");
+  if(t&&document.body.classList.contains("quiz")){t.querySelector(".zh").classList.toggle("show");}
+});
+document.addEventListener("change",function(e){
+  var k=e.target.dataset&&e.target.dataset.k;
+  if(k){saved[k]=e.target.checked;try{localStorage.setItem("eng30-w1",JSON.stringify(saved));}catch(err){}}
+});
+var sb=document.getElementById("slow"),qb=document.getElementById("quiz");
+sb.addEventListener("click",function(){slow=!slow;sb.setAttribute("aria-pressed",String(slow));sb.textContent=slow?"慢速：开":"慢速：关";});
+qb.addEventListener("click",function(){var q=document.body.classList.toggle("quiz");qb.setAttribute("aria-pressed",String(q));qb.textContent=q?"遮住中文：开":"遮住中文：关";});
+function enter(){document.getElementById("lock").hidden=true;document.getElementById("app").hidden=false;fromHash();}
+async function tryCode(code,remember){
+  var ok=await unlock(code);
+  if(ok){if(remember){try{localStorage.setItem("eng30-code",String(code).trim().toUpperCase());}catch(e){}}enter();}
+  return ok;
+}
+document.getElementById("go").addEventListener("click",async function(){
+  var err=document.getElementById("err");err.hidden=true;
+  if(!window.crypto||!crypto.subtle){err.textContent="这个浏览器不支持，请改用 Chrome 或 Safari 打开。";err.hidden=false;return;}
+  var btn=this;btn.disabled=true;btn.textContent="验证中…";
+  var ok=await tryCode(document.getElementById("code").value,true);
+  btn.disabled=false;btn.textContent="开始学习";
+  if(!ok){err.textContent="学习码不正确，请检查后重试。";err.hidden=false;}
+});
+(function(){var s=null;try{s=localStorage.getItem("eng30-code");}catch(e){}if(s&&window.crypto&&crypto.subtle){tryCode(s,false);}})();
+</script>
+</body>
+</html>
